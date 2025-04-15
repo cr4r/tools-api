@@ -1,0 +1,10 @@
+{
+  "root": { "url": "/" },
+  "tools": {
+    "youtube": { "url": "/youtube" }
+  },
+  "user": {
+    "registrasi": { "url": "/registrasi" },
+    "login": { "url": "/login" }
+  }
+}

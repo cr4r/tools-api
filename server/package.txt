@@ -1,0 +1,1 @@
+@fastify/view @fastify/static ejs mongoose @fastify/cors @fastify/session @fastify/cookie @fastify/formbody @fastify/multipart dotenv fastify path

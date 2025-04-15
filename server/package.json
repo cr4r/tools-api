@@ -1,0 +1,37 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "berbagai macam tools",
+  "main": "apps.js",
+  "scripts": {
+    "test": "node app.js",
+    "start": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cr4r/Tools.git"
+  },
+  "keywords": [
+    "toosl",
+    "downloader"
+  ],
+  "author": "cr4r",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/cr4r/Tools/issues"
+  },
+  "homepage": "https://github.com/cr4r/Tools#readme",
+  "dependencies": {
+    "@fastify/cookie": "^11.0.1",
+    "@fastify/cors": "^10.0.1",
+    "@fastify/formbody": "^8.0.1",
+    "@fastify/multipart": "^9.0.1",
+    "@fastify/session": "^11.0.2",
+    "@fastify/static": "^8.0.3",
+    "dotenv": "^16.4.7",
+    "fastify": "^5.2.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.9.2",
+    "path": "^0.12.7"
+  }
+}
