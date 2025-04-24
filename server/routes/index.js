@@ -1,4 +1,4 @@
-const UserRoutes = require("./user");
+const UserRoutes = require("./users");
 const toolRoutes = require("./tools");
 
 module.exports = {

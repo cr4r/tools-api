@@ -13,15 +13,21 @@ const path = require("path");
 const mongoose = require("mongoose");
 // Session and cookie with mongo
 const fastifyCors = require("@fastify/cors");
-const fastifySession = require("@fastify/session");
-const fastifyCookie = require("@fastify/cookie");
+// const fastifySession = require("@fastify/session");
+// const fastifyCookie = require("@fastify/cookie");
 const fastifyFormbody = require("@fastify/formbody");
 const fastifyMultipart = require("@fastify/multipart");
 
 const maxCookie = 24 * 60 * 60 * 1000 * 360; // 360 hari
 
+//// Tools Router
 const { YoutubeRoutes } = require("./routes");
-const { userRegistrasiRoutes } = require("./routes");
+//// User Router
+const {
+  userRegistrasiRoutes,
+  userRefreshTokenRoutes,
+  userLoginRoutes,
+} = require("./routes");
 
 //=====================================================================================//
 
@@ -35,7 +41,7 @@ const startDatabase = async (app) => {
   while (!statuss) {
     try {
       await mongoose.connect(process.env.MONGODB_URI, {
-        serverSelectionTimeoutMS: 4000,
+        serverSelectionTimeoutMS: 5000,
       });
       console.log("✔✔✔ Database sudah terhubung ✔✔✔");
       statuss = true;
@@ -55,31 +61,53 @@ fastify.register(fastifyMultipart, {
     fileSize: 5 * 1024 * 1024, // Batasi ukuran file maksimum 5MB
   },
 });
+
+const allowedOrigins = ["http://localhost:3000", "https://localhost:3000"];
 // Headers Handler
 fastify.register(fastifyCors, {
-  origin: "*",
+  origin: (origin, cb) => {
+    const allowedOrigins = [
+      "http://localhost:3000",
+      "https://localhost:3000",
+      "http://localhost",
+    ];
+
+    if (!origin || allowedOrigins.includes(origin)) {
+      cb(null, true);
+    } else {
+      cb(new Error("Not allowed by CORS"), false);
+    }
+  },
   methods: ["GET", "POST", "PUT", "DELETE"], // allow these methods
-  headers: true, // allow headers
+  // headers: true, // allow headers
   credentials: true, // allow credentials,
+  allowedHeaders: ["Content-Type", "Authorization", "x-auth-token"],
+  optionsSuccessStatus: 204, // Untuk menangani preflight di browser lama
   // exposedHeaders: ["Coders-Family"],
   bodyParser: {
     json: true,
   },
 });
 
+// Custom Header global
+fastify.addHook("onSend", async (req, reply, payload) => {
+  reply.header("x-powered-by", "cr4r");
+  return payload;
+});
+
 // register Form data parsing
 fastify.register(fastifyFormbody);
 // Setup Cookie dan Session
-fastify.register(fastifyCookie);
-fastify.register(fastifySession, {
-  key: "user_sid",
-  secret:
-    "11b8efw5tfe8sfi87d44167606f848234defcea0c91cd899b9f6c33f8354e74ded09",
-  cookie: {
-    maxAge: maxCookie,
-    secure: false,
-  },
-});
+// fastify.register(fastifyCookie);
+// fastify.register(fastifySession, {
+//   key: "user_sid",
+//   secret:
+//     "11b8efw5tfe8sfi87d44167606f848234defcea0c91cd899b9f6c33f8354e74ded09",
+//   cookie: {
+//     maxAge: maxCookie,
+//     secure: false,
+//   },
+// });
 //=====================================================================================//
 
 //=====================================================================================//
@@ -105,6 +133,8 @@ fastify.register(fStatic, {
 //
 fastify.register(YoutubeRoutes, { prefix: "/tools" });
 fastify.register(userRegistrasiRoutes, { prefix: "/" });
+fastify.register(userRefreshTokenRoutes, { prefix: "/" });
+fastify.register(userLoginRoutes, { prefix: "/" });
 //=====================================================================================//
 
 //=====================================================================================//

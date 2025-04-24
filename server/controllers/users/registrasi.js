@@ -3,6 +3,7 @@ const { handleServerResponseError } = require(`${root_path}/middlewares`);
 const { User } = require(`${root_path}/models`);
 
 const registrasi_post = async (req, reply) => {
+  // console.log(req.body);
   try {
     const create_user = new User(req.body);
     const result = await create_user.save();
@@ -10,8 +11,10 @@ const registrasi_post = async (req, reply) => {
       .status(200)
       .send({ status: true, data: result, message: "ok berhasil terdaftar" });
   } catch (err) {
-    const { status, message } = await handleServerResponseError(err);
-    return reply.status(status).send(message);
+    const { codeStatus, status, message } = await handleServerResponseError(
+      err
+    );
+    return reply.status(codeStatus).send({ status, message });
   }
 };
 

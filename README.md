@@ -7,3 +7,6 @@ pm2 start ./apps.js --name my-api --watch --node-args="--inspect"
 pm2 logs
 pm2 plus
 npm install -g autocannon doctor
+
+npm config set proxy http://192.168.241.119:8080
+npm config delete proxy

@@ -1,6 +1,9 @@
 const root_path = process.env.ROOT_PATH;
-const { generateTokens } = require(`${root_path}/middlewares`);
-const { User } = require(`${root_path}/models`);
+const {
+  generateAccessToken,
+  generateRefreshToken,
+} = require(`${root_path}/middlewares`);
+const { User, refreshTokenModel } = require(`${root_path}/models`);
 
 const login_post = async (req, reply) => {
   const { email, password } = req.body;
@@ -10,10 +13,19 @@ const login_post = async (req, reply) => {
   const isMatch = await user.comparePassword(password);
   if (!isMatch) return reply.code(401).send({ error: "Password salah" });
 
-  const { accessToken, refreshToken } = generateTokens({
+  const accessToken = generateAccessToken({
     _id: user._id,
     email: user.email,
     role: user.role,
+  });
+
+  const refreshToken = generateRefreshToken({ _id: user._id });
+
+  // Simpan refresh token ke database
+  await HistoryLogin.create({
+    userId: user._id,
+    token: refreshToken,
+    expiryDate: new Date(Date.now() + REFRESH_TOKEN_EXPIRY_MS),
   });
 
   user.refresh_token = refreshToken;

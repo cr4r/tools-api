@@ -3,8 +3,9 @@
   "tools": {
     "youtube": { "url": "/youtube" }
   },
-  "user": {
+  "pengguna": {
     "registrasi": { "url": "/registrasi" },
-    "login": { "url": "/login" }
+    "login": { "url": "/login" },
+    "user": { "url": "/user" }
   }
 }

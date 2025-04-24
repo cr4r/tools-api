@@ -4,59 +4,60 @@ const { get } = require("mongoose");
     // Logic untuk membuat material
   }, reply);
 */
-const handleServerResponse = async (tryBlock, reply) => {
-  try {
-    await tryBlock();
-  } catch (err) {
-    // Handling duplicate key error (MongoDB)
-    if (err.code === 11000) {
-      const duplicateKey = Object.keys(err.keyPattern)[0];
-      const duplicateValue = err.keyValue[duplicateKey];
-      return reply.status(400).send({
-        status: false,
-        message: `Data dengan ${duplicateKey} "${duplicateValue}" sudah ada. Silakan gunakan ${duplicateKey} yang berbeda.`,
-      });
-    }
-
-    // Handling Validation Error (Mongoose)
-    else if (err.name === "ValidationError") {
-      const errors = err.errors;
-      const errorMessages = Object.keys(errors).map((key) => {
-        return `${key}`;
-      });
-      return reply.status(400).send({
-        status: false,
-        message: `Kesalahan bagian (${errorMessages
-          .join(", ")
-          .replace(/_/g, " ")}) harus di isi yang benar`,
-      });
-    }
-
-    // Handling JWT Error
-    else if (err.name === "JsonWebTokenError") {
-      return reply.status(401).send({
-        status: false,
-        message: "Token tidak valid",
-      });
-    }
-
-    // Handling Token Expired Error
-    else if (err.name === "TokenExpiredError") {
-      return reply.status(401).send({
-        status: false,
-        message: "Token sudah kadaluarsa",
-      });
-    }
-
-    // Logging error untuk debug
-    console.error(err);
-
-    // Default error handling
-    return reply.status(500).send({
+const handleServerResponseError = async (err) => {
+  // Handling duplicate key error (MongoDB)
+  if (err.code === 11000) {
+    const duplicateKey = Object.keys(err.keyPattern)[0];
+    const duplicateValue = err.keyValue[duplicateKey];
+    return {
+      codeStatus: 400,
       status: false,
-      message: err.message || "Terjadi kesalahan pada server",
-    });
+      message: `Data dengan ${duplicateKey} "${duplicateValue}" sudah ada. Silakan gunakan ${duplicateKey} yang berbeda.`,
+    };
   }
+
+  // Handling Validation Error (Mongoose)
+  else if (err.name === "ValidationError") {
+    const errors = err.errors;
+    const errorMessages = Object.keys(errors).map((key) => {
+      return `${key}`;
+    });
+    return {
+      codeStatus: 400,
+      status: false,
+      message: `Kesalahan bagian (${errorMessages
+        .join(", ")
+        .replace(/_/g, " ")}) harus di isi yang benar`,
+    };
+  }
+
+  // Handling JWT Error
+  else if (err.name === "JsonWebTokenError") {
+    return {
+      codeStatus: 401,
+      status: false,
+      message: "Token tidak valid",
+    };
+  }
+
+  // Handling Token Expired Error
+  else if (err.name === "TokenExpiredError") {
+    return {
+      codeStatus: 401,
+      status: false,
+      message: "Token sudah kadaluarsa",
+    };
+  }
+
+  // Logging error untuk debug
+  console.error(err);
+
+  // Default error handling
+  return {
+    codeStatus: 500,
+    status: false,
+    message: err.message || "Terjadi kesalahan pada server",
+  };
 };
 
 const getReqParts = async (parts) => {
@@ -89,5 +90,5 @@ const getReqParts = async (parts) => {
 
 module.exports = {
   getReqParts,
-  handleServerResponse,
+  handleServerResponseError,
 };
