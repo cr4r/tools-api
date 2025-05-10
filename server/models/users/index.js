@@ -1,7 +1,7 @@
 const usermodel = require("./user.model");
-const refreshTokenmodels = require("./refreshToken.model");
+const usertokenmodels = require("./user.token.model");
 
 module.exports = {
   ...usermodel,
-  ...refreshTokenmodels,
+  ...usertokenmodels,
 };

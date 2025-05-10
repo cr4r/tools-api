@@ -15,32 +15,38 @@ Refresh Token (setelah login) digunakan untuk mendapatkan akses token serta log 
 
 function generateAccessToken(user) {
   const { _id, email, role, fullName } = user;
-  let payload = {
-    id: _id.toString(),
-    email,
-    role,
-    fullName,
-    iat: Math.floor(Date.now() / 1000),
-  };
-  return jwt.sign(payload, access_token_secret, {
-    expiresIn: access_token_exp,
-  });
+  return jwt.sign(
+    {
+      id: _id.toString(),
+      email,
+      role,
+      fullName,
+      iat: Math.floor(Date.now() / 1000),
+    },
+    access_token_secret,
+    {
+      expiresIn: access_token_exp,
+    }
+  );
 }
 
 function generateRefreshToken(user) {
   const jti = uuidv4(); // ID unik token
 
-  let payload = {
-    id: user._id.toString(),
-    jti,
-    iss: "coders.family.api", // nama issuer
-    aud: "coders.family.app", // target audience (misalnya Android app)
-  };
-
-  return {
-    token: jwt.sign(payload, refresh_token_secret, {
+  let token = jwt.sign(
+    {
+      id: user._id.toString(),
+      jti,
+      iss: "coders.family.api", // nama issuer
+      aud: "coders.family.app", // target audience (misalnya Android app)
+    },
+    refresh_token_secret,
+    {
       expiresIn: refresh_token_exp,
-    }),
+    }
+  );
+  return {
+    token,
     jti,
   };
 }

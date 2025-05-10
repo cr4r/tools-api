@@ -7,9 +7,10 @@ const {
   expiryDateToken,
 } = require(`${root_path}/middlewares`);
 const jwt = require("jsonwebtoken");
+const { hashToken } = require(`${root_path}/services`);
 let tokenenv = process.env.REFRESH_TOKEN_SECRET;
 
-const refresh_token_post = async (req, reply) => {
+const user_token_post = async (req, reply) => {
   //// Token = Refresh Token
   const { token } = req.body;
   if (!token)
@@ -17,7 +18,7 @@ const refresh_token_post = async (req, reply) => {
       .code(401)
       .send({ status: false, message: "Token refresh diperlukan" });
 
-  const saved = await HistoryLogin.findOne({ token });
+  const saved = await HistoryLogin.findOne({ token: hashToken(token) });
   if (!saved)
     return reply
       .code(403)
@@ -49,17 +50,18 @@ const refresh_token_post = async (req, reply) => {
 
     return reply.status(201).send({
       status: true,
-      message: "Berhasil merefresh token kamu",
+      message: "Berhasil memperbarui token kamu",
       token: newAccessToken,
     });
   } catch (err) {
     console.log(err);
-    return reply
-      .code(403)
-      .send({ status: false, message: "Token tidak valid atau kadaluarsa" });
+    return reply.code(403).send({
+      status: false,
+      message: "Refresh Token tidak valid atau kadaluarsa",
+    });
   }
 };
 
 module.exports = {
-  refresh_token_post,
+  user_token_post,
 };

@@ -27,6 +27,10 @@ const HistoryLoginSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+/* TTL index (hapus otomatis setelah expired)
+User yang expired akan terhapus otomatis*/
+HistoryLoginSchema.index({ expiryDate: 1 }, { expireAfterSeconds: 0 });
+
 const HistoryLogin = mongoose.model("HistoryLogin", HistoryLoginSchema);
 
 module.exports = { HistoryLogin };
