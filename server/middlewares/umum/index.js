@@ -1,5 +1,7 @@
-const textTool = require("./text");
+const auth = require("./auth");
+const DetectDevice = require("./DetectDevice");
 
 module.exports = {
-  ...textTool,
+  ...auth,
+  ...DetectDevice,
 };

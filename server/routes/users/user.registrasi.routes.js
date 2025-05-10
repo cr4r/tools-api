@@ -20,4 +20,19 @@ async function userRegistrasiRoutes(fastify, options) {
   );
 }
 
+/*
+app.route({
+  method: 'GET',
+  url: '/admin-endpoint',
+  preHandler: async (req, reply) => {
+    req.requiredRole = 'admin.user'; // Tentukan role yang diperlukan
+    await verifyTokenAndRole(req, reply); // Verifikasi token dan role
+  },
+  handler: async (req, reply) => {
+    // Hanya admin yang dapat mengakses bagian ini
+    reply.send({ message: "Welcome, admin!" });
+  }
+});
+*/
+
 module.exports = { userRegistrasiRoutes };

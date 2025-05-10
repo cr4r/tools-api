@@ -1,0 +1,28 @@
+judul projek = Full Rest API,
+akses server ini = 0.0.0.0:3000,
+Framework = "fastify": "^5.2.0",
+menggunakan dotenv
+```MONGODB_URI=mongodb://localhost:27017/Tools
+ACCESS_TOKEN_SECRET=48dhi-329kx-pwl24-jdm93-pqz30
+REFRESH_TOKEN_SECRET=45sho-399zx-woq26-fam36-csz61
+ACCESS_TOKEN_EXPIRY=30m
+REFRESH_TOKEN_EXPIRY=7d
+ENCRYPTION_SECRET=39spi-flxa2-dlje3-sjx93-p3430
+APIKEY=CodersFamily1122
+USERMAIL=coders.family.reborn@gmail.com
+PASSMAIL=123 123 123 123
+APIGPT=123-123-123-123-123
+CONFIG_FILE=D:\Projek\tools-api\server\config.json
+MATERIAL_FILE=D:\Projek\tools-api\server\material.json
+ROOT_PATH=D:\Projek\tools-api\server```
+database = "mongoose": "^8.9.2" (local),
+menggunakan jwt, bcrypt, @fastify/rate-limit
+```// Mengonfigurasi rate limit
+fastify.register(fastify_limit, {
+  max: 5, // Maksimal 100 permintaan
+  timeWindow: "1 minute", // Dalam 1 menit
+});```
+tujuan = membuat full rest api untuk menghubungkan pada aplikasi yang akan dibuat,
+masalah = pada login dan register pada bagian
+
+tolong pelajari semua tentang itu, jika sudah saya akan membahasnya

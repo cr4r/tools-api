@@ -1,9 +1,3 @@
-const { get } = require("mongoose");
-
-/* await handleServerResponse(async () => {
-    // Logic untuk membuat material
-  }, reply);
-*/
 const handleServerResponseError = async (err) => {
   // Handling duplicate key error (MongoDB)
   if (err.code === 11000) {

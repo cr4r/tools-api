@@ -10,12 +10,19 @@ Content-Type: application/json
   "password" : "123"
 }
 
-### DAFTARKAN USER
+### LOGIN USER
 POST {{hostname}}/login HTTP/1.1
 Content-Type: application/json
 
 {
-  "fullName" :"cr4r",
   "email":"cr4r@gmail.com",
   "password" : "123"
+}
+
+### Refresh Token
+POST {{hostname}}/user/refresh HTTP/1.1
+Content-Type: application/json
+
+{
+  "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MWNjMjA5M2Y2MTg2YTZhYjcxMjRmOCIsImRhdGUiOiIyMDI1LTA1LTA4VDE2OjQ0OjUzLjk1NFoiLCJpYXQiOjE3NDY3MjI2OTMsImV4cCI6MTc0NzMyNzQ5M30.4kxbeKPGlRsEd80oIY6PzGl90TWpPJbARvsQ0a8-n0s"
 }

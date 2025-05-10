@@ -19,7 +19,7 @@ const auth = (req, reply, done) => {
     req.user = decoded; // Simpan info user dari token
     done();
   } catch (err) {
-    reply
+    return reply
       .code(403)
       .send({ status: true, message: "error!!!", error: "Token tidak valid" });
   }

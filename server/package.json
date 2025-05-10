@@ -5,7 +5,7 @@
   "main": "apps.js",
   "scripts": {
     "test": "node app.js",
-    "start": "nodemon app.js"
+    "start": "nodemon app.js --trace-warnings"
   },
   "repository": {
     "type": "git",
@@ -22,17 +22,22 @@
   },
   "homepage": "https://github.com/cr4r/Tools#readme",
   "dependencies": {
-    "@fastify/cookie": "^11.0.1",
     "@fastify/cors": "^10.0.1",
     "@fastify/formbody": "^8.0.1",
+    "@fastify/helmet": "^13.0.1",
     "@fastify/multipart": "^9.0.1",
+    "@fastify/rate-limit": "^10.2.2",
     "@fastify/session": "^11.0.2",
     "@fastify/static": "^8.0.3",
     "bcrypt": "^5.1.1",
     "dotenv": "^16.4.7",
     "fastify": "^5.2.0",
+    "hostname": "^1.0.5",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.9.2",
-    "path": "^0.12.7"
+    "ms": "^2.1.3",
+    "path": "^0.12.7",
+    "ua-parser-js": "^2.0.3",
+    "uuid": "^11.1.0"
   }
 }

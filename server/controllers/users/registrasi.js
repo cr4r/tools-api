@@ -1,11 +1,16 @@
 const root_path = process.env.ROOT_PATH;
-const { handleServerResponseError } = require(`${root_path}/middlewares`);
+const {
+  handleServerResponseError,
+  sanitizeInput,
+} = require(`${root_path}/services`);
 const { User } = require(`${root_path}/models`);
 
 const registrasi_post = async (req, reply) => {
   // console.log(req.body);
   try {
-    const create_user = new User(req.body);
+    let allowInput = ["email", "password", "fullName"];
+    let body = await sanitizeInput(req.body, allowInput);
+    const create_user = new User(body);
     const result = await create_user.save();
     return reply
       .status(200)
@@ -21,17 +26,25 @@ const registrasi_post = async (req, reply) => {
 const registrasi_put = async (req, reply) => {
   const { fullName, email, id } = req.body;
 
-  // Akses user dari token
-  const userFromToken = req.user;
+  let allowInput = ["email", "password", "fullName"];
+  let body = await sanitizeInput(req.body, allowInput);
 
-  // Validasi: User hanya bisa edit dirinya sendiri kecuali dia Admin
-  if (userFromToken.role !== "Admin" && userFromToken._id !== id) {
-    return reply.code(403).send({
-      status: false,
-      message: "Error!!!",
-      error: "Kamu tidak punya akses mengedit user ini",
-    });
+  // Jika ada password, hash dulu
+  if (body.password) {
+    const salt = await bcrypt.genSalt(10);
+    body.password = await bcrypt.hash(body.password, salt);
   }
+  // // Akses user dari token
+  // const userFromToken = req.user;
+
+  // // Validasi: User hanya bisa edit dirinya sendiri kecuali dia Admin
+  // if (userFromToken.role !== "Admin" && userFromToken._id !== id) {
+  //   return reply.code(403).send({
+  //     status: false,
+  //     message: "Error!!!",
+  //     error: "Kamu tidak punya akses mengedit user ini",
+  //   });
+  // }
 
   try {
     const updated = await User.findByIdAndUpdate(

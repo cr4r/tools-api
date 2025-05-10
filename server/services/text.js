@@ -8,7 +8,7 @@ Convert Kata jadi Aaaa Bbbb Cccc */
 const capitalizeCase = (teks) => {
   let hasil = "";
   let allTeks = teks.split(" ");
-  for (i = 0; i < allTeks.length; i++) {
+  for (let i = 0; i < allTeks.length; i++) {
     hasil += sentenceCase(allTeks[i]) + " ";
   }
   return hasil;

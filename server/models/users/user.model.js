@@ -2,38 +2,42 @@ const root_path = process.env.ROOT_PATH;
 
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
-const { capitalizeCase } = require(`${root_path}/middlewares/`);
+const { capitalizeCase } = require(`${root_path}/services`);
 
 let typeUser = ["Admin", "User", "Team"];
 
-const UserSchema = new mongoose.Schema({
-  fullName: {
-    type: String,
-    required: true,
-    trim: true,
+const UserSchema = new mongoose.Schema(
+  {
+    fullName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      trim: true,
+      unique: true,
+      lowercase: true,
+    },
+    role: {
+      type: String,
+      enum: typeUser,
+      default: "Admin",
+      trim: true,
+    },
+    password: {
+      type: String,
+      require: true,
+      // Selection: false,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
   },
-  email: {
-    type: String,
-    required: true,
-    trim: true,
-    unique: true,
-    lowercase: true,
-  },
-  role: {
-    type: String,
-    enum: typeUser,
-    default: "Admin",
-    trim: true,
-  },
-  password: {
-    type: String,
-    require: true,
-    // Selection: false,
-  },
-  refresh_token: {
-    type: String,
-  },
-});
+  { timestamps: true }
+);
 
 //Encrypt password , salt (kedalaman) = 5
 const encryptPassword = async (password, jumSalt = 5) => {
@@ -49,17 +53,18 @@ UserSchema.pre("save", async function (next) {
       console.log(
         "Ada yang mencoba mengubah alur role yang telah ditetapkan!!!"
       );
-      delete this.role;
+      delete this.role; // Hapus role yang tidak valid
     }
 
     if (this.isModified("role") || this.isNew) {
       this.role = capitalizeCase(this.role);
     }
 
-    // Encrypt Password User
+    // Enkripsi password jika diubah atau baru
     if (this.isModified("password") || this.isNew) {
       this.password = await encryptPassword(this.password);
     }
+    next();
   } catch (err) {
     next(err);
   }
@@ -78,9 +83,12 @@ UserSchema.pre(
     if (data.role && !typeUser.includes(data.role)) {
       delete data.role;
     }
+
     if (data.role) {
       this.role = capitalizeCase(data.role);
     }
+
+    next();
   }
 );
 
@@ -97,4 +105,4 @@ UserSchema.methods.comparePassword = async function (password) {
 
 const User = mongoose.model("user", UserSchema);
 
-module.exports = User;
+module.exports = { User };

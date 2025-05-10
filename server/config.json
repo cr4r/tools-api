@@ -1,11 +1,21 @@
 {
-  "root": { "url": "/" },
+  "root": {
+    "url": "/"
+  },
   "tools": {
-    "youtube": { "url": "/youtube" }
+    "youtube": {
+      "url": "/youtube"
+    }
   },
   "pengguna": {
-    "registrasi": { "url": "/registrasi" },
-    "login": { "url": "/login" },
-    "user": { "url": "/user" }
+    "registrasi": {
+      "url": "/registrasi"
+    },
+    "login": {
+      "url": "/login"
+    },
+    "user": {
+      "url": "/user"
+    }
   }
 }

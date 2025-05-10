@@ -1,11 +1,32 @@
 const mongoose = require("mongoose");
 
-const RefreshTokenSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-  token: { type: String, required: true },
-  expiryDate: { type: Date, required: true },
-});
+const HistoryLoginSchema = new mongoose.Schema(
+  {
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    //// DARI REFRESH TOKEN
+    token: { type: String, required: true },
+    jti: { type: String, required: true, index: true },
+    expiryDate: { type: Date, required: true },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
+    deviceInfo: {
+      os: String,
+      browser: String,
+      ip: String,
+      device: String,
+      userAgent: String,
+      device: String,
+      sourceType: String,
+      rawUA: String,
+    },
+    iss: String,
+    aud: String,
+  },
+  { timestamps: true }
+);
 
-const refreshTokenModel = mongoose.model("HistoryLogin", RefreshTokenSchema);
+const HistoryLogin = mongoose.model("HistoryLogin", HistoryLoginSchema);
 
-module.exports = refreshTokenModel;
+module.exports = { HistoryLogin };

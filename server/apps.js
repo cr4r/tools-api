@@ -1,4 +1,5 @@
 "use strict";
+
 //=====================================================================================//
 // Initialize Module
 const { root, tools } = require("./config.json");
@@ -17,6 +18,7 @@ const fastifyCors = require("@fastify/cors");
 // const fastifyCookie = require("@fastify/cookie");
 const fastifyFormbody = require("@fastify/formbody");
 const fastifyMultipart = require("@fastify/multipart");
+const fastify_limit = require("@fastify/rate-limit");
 
 const maxCookie = 24 * 60 * 60 * 1000 * 360; // 360 hari
 
@@ -62,7 +64,12 @@ fastify.register(fastifyMultipart, {
   },
 });
 
-const allowedOrigins = ["http://localhost:3000", "https://localhost:3000"];
+// Mengonfigurasi rate limit
+fastify.register(fastify_limit, {
+  max: 5, // Maksimal 100 permintaan
+  timeWindow: "1 minute", // Dalam 1 menit
+});
+
 // Headers Handler
 fastify.register(fastifyCors, {
   origin: (origin, cb) => {
@@ -70,6 +77,8 @@ fastify.register(fastifyCors, {
       "http://localhost:3000",
       "https://localhost:3000",
       "http://localhost",
+      "http://192.168.10.15:3000",
+      "http://192.168.10.15",
     ];
 
     if (!origin || allowedOrigins.includes(origin)) {
@@ -160,9 +169,11 @@ const start = async (app) => {
 
     // Memulai server
     await app.listen({
-      address: "0.0.0.0",
+      host: "0.0.0.0",
       port: process.env.PORT || 3000,
     });
+    await app.ready(); // pastikan server siap
+
     app.log.info(
       `Server telah berjalan di port ${fastify.server.address().port}`
     );
