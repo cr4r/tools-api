@@ -3,11 +3,10 @@ const {
   generateAccessToken,
   generateRefreshToken,
   expiryDateToken,
-} = require(`${root_path}/middlewares`);
-const jwt = require("jsonwebtoken");
-
+  verifyToken,
+  hashToken,
+} = require(`${root_path}/services`);
 const { User, HistoryLogin } = require(`${root_path}/models/users`);
-const { hashToken } = require(`${root_path}/services`);
 
 const login_post = async (req, reply) => {
   const { email, password } = req.body;
@@ -70,41 +69,35 @@ const logout_post = async (req, reply) => {
       message: "Refresh token diperlukan untuk logout",
     });
 
-  try {
-    // Verifikasi refresh token
-    const decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
+  // Verifikasi refresh token
+  const { status, message, codeStatus } = verifyToken(token, "refresh");
+  if (status == false)
+    return reply.status(codeStatus).send({ status, message });
 
-    // Ambil jti dari token
-    const tokenJti = decoded.jti;
+  // Ambil jti dari token
+  const tokenJti = message.jti;
 
-    if (!tokenJti) {
-      return reply.status(400).send({
-        status: false,
-        message: "Token tidak valid (tidak ada jti)",
-      });
-    }
-
-    // Hapus token dari database
-    const deleted = await HistoryLogin.findOneAndDelete({ jti: tokenJti });
-
-    if (!deleted) {
-      return reply.status(404).send({
-        status: false,
-        message: "Token tidak ditemukan atau sudah dihapus",
-      });
-    }
-
-    return reply.status(200).send({
-      status: true,
-      message: "Logout berhasil, token telah dihapus",
-    });
-  } catch (err) {
-    console.error(err);
-    return reply.status(403).send({
+  if (!tokenJti) {
+    return reply.status(400).send({
       status: false,
-      message: "Token tidak valid atau sudah kadaluarsa",
+      message: "Token tidak valid (tidak ada jti)",
     });
   }
+
+  // Hapus token dari database
+  const deleted = await HistoryLogin.findOneAndDelete({ jti: tokenJti });
+
+  if (!deleted) {
+    return reply.status(404).send({
+      status: false,
+      message: "Token tidak ditemukan atau sudah dihapus",
+    });
+  }
+
+  return reply.status(200).send({
+    status: true,
+    message: "Logout berhasil, token lama telah dihapus",
+  });
 };
 
 module.exports = {

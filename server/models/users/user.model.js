@@ -1,7 +1,7 @@
 const root_path = process.env.ROOT_PATH;
 
 const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
+const bcryptjs = require("bcryptjs");
 const { capitalizeCase } = require(`${root_path}/services`);
 
 let typeUser = ["Admin", "User", "Team"];
@@ -41,8 +41,8 @@ const UserSchema = new mongoose.Schema(
 
 //Encrypt password , salt (kedalaman) = 5
 const encryptPassword = async (password, jumSalt = 5) => {
-  const salt = await bcrypt.genSalt(jumSalt);
-  return await bcrypt.hash(password, salt);
+  const salt = await bcryptjs.genSalt(jumSalt);
+  return await bcryptjs.hash(password, salt);
 };
 
 // Prepare sebelum save ke database
@@ -95,7 +95,7 @@ UserSchema.pre(
 // Menyamakan password pada database
 UserSchema.methods.comparePassword = async function (password) {
   try {
-    const hasil = await bcrypt.compare(password, this.password);
+    const hasil = await bcryptjs.compare(password, this.password);
     return hasil;
   } catch (error) {
     console.log(error);

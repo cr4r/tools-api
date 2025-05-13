@@ -1,15 +1,12 @@
 const root_path = process.env.ROOT_PATH;
 const { User, HistoryLogin } = require(`${root_path}/models`);
 const {
-  verifyRefreshToken,
+  hashToken,
+  verifyToken,
   generateAccessToken,
-  generateRefreshToken,
-  expiryDateToken,
-} = require(`${root_path}/middlewares`);
-const jwt = require("jsonwebtoken");
-const { hashToken } = require(`${root_path}/services`);
-let tokenenv = process.env.REFRESH_TOKEN_SECRET;
+} = require(`${root_path}/services`);
 
+//// UNTUK REFRESH TOKEN, AKSES TOKEN BARU
 const user_token_post = async (req, reply) => {
   //// Token = Refresh Token
   const { token } = req.body;
@@ -26,10 +23,12 @@ const user_token_post = async (req, reply) => {
 
   try {
     ////GUNAKAN REFRESH TOKEN UNTUK TOKENNYA
-    const payload = jwt.verify(token, tokenenv);
+    const { status, message, codeStatus } = verifyToken(token, "refresh");
+    if (status == false)
+      return reply.status(codeStatus).send({ status, message });
 
     //// AMBIL DATA USER SESUAIKAN DENGAN ID YANG ADA DI REFRESH TOKEN
-    const user = await User.findById(payload.id);
+    const user = await User.findById(message.id);
     if (!user) {
       //// GUNAKAN LOGIC DISINI UNTUK HAPUS APA SAJA JIKA USER TIDAK ADA
       // Hapus seluruh token refresh milik user ini
@@ -41,12 +40,7 @@ const user_token_post = async (req, reply) => {
     }
 
     //// JIKA VALID, MAKA BUAT ACCESS TOKEN BARU
-    const newAccessToken = generateAccessToken({
-      _id: user._id,
-      email: user.email,
-      role: user.role,
-      fullName: user.fullName,
-    });
+    const newAccessToken = generateAccessToken(user);
 
     return reply.status(201).send({
       status: true,

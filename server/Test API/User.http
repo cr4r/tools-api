@@ -1,4 +1,6 @@
 @hostname=http://localhost:3000
+@accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MWQ5ZTE3YjVhMmRlODBkY2I4YWMzMCIsImVtYWlsIjoiY3I0ckBnbWFpbC5jb20iLCJyb2xlIjoiQWRtaW4iLCJmdWxsTmFtZSI6ImNyNHIiLCJpYXQiOjE3NDcxNDIzMDYsImV4cCI6MTc0NzE0NDEwNiwiYXVkIjoiY29kZXJzLmZhbWlseS5hcHAiLCJpc3MiOiJjb2RlcnMuZmFtaWx5LmFwaSJ9.MH8FUc09STpDhYXqTyH0RqdFIXoq5P63nl0j61z0aDY
+@refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MWQ5ZTE3YjVhMmRlODBkY2I4YWMzMCIsImp0aSI6IjI4M2FkYWQzLTVjODItNDZkZC1iYThmLTk1MGQwMDI0NDA3NiIsImlhdCI6MTc0NzE0MTg1NywiZXhwIjoxNzQ3NzQ2NjU3LCJhdWQiOiJjb2RlcnMuZmFtaWx5LmFwcCIsImlzcyI6ImNvZGVycy5mYW1pbHkuYXBpIn0.24hr_qsq2ffz43fUS72c7_NAxffSjKXc_PhD6TMu-RE
 
 ### DAFTARKAN USER
 POST {{hostname}}/registrasi HTTP/1.1
@@ -18,13 +20,23 @@ Content-Type: application/json
   "email":"cr4r@gmail.com",
   "password" : "123"
 }
-
+############################################################
 ### Refresh Token
 POST {{hostname}}/user/refresh HTTP/1.1
 Content-Type: application/json
 
 {
-  "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MWQ5ZTE3YjVhMmRlODBkY2I4YWMzMCIsImp0aSI6ImZmN2YxN2I1LWQ5NTgtNGNmOS05MjIwLWE2MTAwYjgxMjg2ZCIsImlzcyI6ImNvZGVycy5mYW1pbHkuYXBpIiwiYXVkIjoiY29kZXJzLmZhbWlseS5hcHAiLCJpYXQiOjE3NDY4ODcyNjgsImV4cCI6MTc0NzQ5MjA2OH0.kHGjF1jir5jD63qW9tNwAc-bWM9rfFEFUcecA7SfEaM"
+  "token":"{{refreshToken}}"
+}
+
+### EDIT USER
+PUT {{hostname}}/user HTTP/1.1
+Content-Type: application/json
+Authorization:Bearer {{accessToken}}
+# x-auth-token: {{accessToken}}
+
+{
+  "token":""
 }
 
 ### Logout Token
@@ -32,5 +44,15 @@ POST {{hostname}}/user/logout HTTP/1.1
 Content-Type: application/json
 
 {
-  "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MWQ5ZTE3YjVhMmRlODBkY2I4YWMzMCIsImp0aSI6ImZmN2YxN2I1LWQ5NTgtNGNmOS05MjIwLWE2MTAwYjgxMjg2ZCIsImlzcyI6ImNvZGVycy5mYW1pbHkuYXBpIiwiYXVkIjoiY29kZXJzLmZhbWlseS5hcHAiLCJpYXQiOjE3NDY4ODcyNjgsImV4cCI6MTc0NzQ5MjA2OH0.kHGjF1jir5jD63qW9tNwAc-bWM9rfFEFUcecA7SfEaM"
+  "token":"{{refreshToken}}"
+}
+
+### DELETE USER
+DELETE {{hostname}}/user/681d9e17b5a2de80dcb8ac30 HTTP/1.1
+Content-Type: application/json
+Authorization:Bearer {{accessToken}}
+# x-auth-token: {{accessToken}}
+
+{
+  "token":""
 }

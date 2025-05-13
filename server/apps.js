@@ -29,6 +29,7 @@ const {
   userRegistrasiRoutes,
   userTokenRoutes,
   userLoginRoutes,
+  userPenggunaRoutes,
 } = require("./routes");
 
 //=====================================================================================//
@@ -144,6 +145,7 @@ fastify.register(YoutubeRoutes, { prefix: "/tools" });
 fastify.register(userRegistrasiRoutes, { prefix: "/" });
 fastify.register(userTokenRoutes, { prefix: "/" });
 fastify.register(userLoginRoutes, { prefix: "/" });
+fastify.register(userPenggunaRoutes, { prefix: "/" });
 //=====================================================================================//
 
 //=====================================================================================//

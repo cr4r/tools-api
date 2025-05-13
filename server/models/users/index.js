@@ -1,7 +1,9 @@
-const usermodel = require("./user.model");
-const usertokenmodels = require("./user.token.model");
+const userModel = require("./user.model");
+const userTokenModels = require("./user.token.model");
+const userAuditModels = require("./user.audit.model");
 
 module.exports = {
-  ...usermodel,
-  ...usertokenmodels,
+  ...userModel,
+  ...userTokenModels,
+  ...userAuditModels,
 };
