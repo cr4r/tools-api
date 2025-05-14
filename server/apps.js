@@ -105,6 +105,14 @@ fastify.addHook("onSend", async (req, reply, payload) => {
   return payload;
 });
 
+//// Handle error schema
+fastify.register(require("@fastify/ajv-compiler"), {
+  customOptions: {
+    allErrors: true,
+    ajvErrors: true,
+  },
+});
+
 // register Form data parsing
 fastify.register(fastifyFormbody);
 // Setup Cookie dan Session

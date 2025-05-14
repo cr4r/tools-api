@@ -1,15 +1,23 @@
 const configFile = process.env.CONFIG_FILE;
 const root_path = process.env.ROOT_PATH;
 const { pengguna } = require(configFile);
-const { verifyTokenAndRole, auth } = require(`${root_path}/middlewares`);
-
+const {
+  verifyTokenAndRole,
+  schemaValidatorUser,
+} = require(`${root_path}/middlewares`);
 const { pengguna_put, pengguna_delete } = require(`${root_path}/controllers`);
+const { userUpdateSchema } = require(`${root_path}/schemas`);
 
 async function userPenggunaRoutes(fastify, options) {
   // Kelola user
   fastify.put(
     pengguna.user.url,
-    { preHandler: verifyTokenAndRole("admin.user") },
+    {
+      preHandler: [
+        verifyTokenAndRole("admin.user"),
+        schemaValidatorUser(userUpdateSchema),
+      ],
+    },
     pengguna_put
   );
   fastify.delete(

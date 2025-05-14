@@ -2,7 +2,9 @@ const root_path = process.env.ROOT_PATH;
 const {
   handleServerResponseError,
   sanitizeInput,
+  validateInputUser,
 } = require(`${root_path}/services`);
+
 const { User } = require(`${root_path}/models`);
 
 const registrasi_post = async (req, reply) => {
@@ -10,6 +12,7 @@ const registrasi_post = async (req, reply) => {
   try {
     let allowInput = ["email", "password", "fullName"];
     let body = await sanitizeInput(req.body, allowInput);
+
     const create_user = new User(body);
     const { fullName, email } = await create_user.save();
     return reply.status(200).send({

@@ -46,7 +46,7 @@ const auth = async (req, reply, done) => {
 };
 
 function verifyTokenAndRole(allowedRolesStr, typeToken = "access") {
-  return async function (req, reply, done) {
+  return async function (req, reply) {
     // Ambil token dari berbagai sumber (header, body, query)
     const token = getTokenReq(req);
     if (!token) {

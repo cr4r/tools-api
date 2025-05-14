@@ -14,4 +14,26 @@ function sanitizeInput(data, allowedFields) {
   return sanitized;
 }
 
-module.exports = { sanitizeInput };
+const validateInputUser = (data) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const passwordRegex = /^.{3,}$/;
+  const fullNameRegex = /^[A-Za-z\s]{3,}$/;
+
+  const errors = {};
+
+  if (!emailRegex.test(data.email)) {
+    errors.email = "Email tidak valid";
+  }
+
+  if (!passwordRegex.test(data.password)) {
+    errors.password = "Password minimal 3 karakter";
+  }
+
+  if (!fullNameRegex.test(data.fullName)) {
+    errors.fullName = "Full name minimal 3 huruf dan hanya huruf/spasi";
+  }
+
+  return errors;
+};
+
+module.exports = { sanitizeInput, validateInputUser };

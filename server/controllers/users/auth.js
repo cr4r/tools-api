@@ -14,7 +14,6 @@ const user_token_post = async (req, reply) => {
     return reply
       .code(401)
       .send({ status: false, message: "Token refresh diperlukan" });
-
   const saved = await HistoryLogin.findOne({ token: hashToken(token) });
   if (!saved)
     return reply
@@ -32,7 +31,7 @@ const user_token_post = async (req, reply) => {
     if (!user) {
       //// GUNAKAN LOGIC DISINI UNTUK HAPUS APA SAJA JIKA USER TIDAK ADA
       // Hapus seluruh token refresh milik user ini
-      await HistoryLogin.deleteMany({ userId: payload.id });
+      await HistoryLogin.deleteMany({ userId: message.id });
 
       return reply
         .status(401)

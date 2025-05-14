@@ -12,10 +12,13 @@ const pengguna_put = async (req, reply) => {
     let allowInput = ["email", "password", "fullName"];
     let body = await sanitizeInput(req.body, allowInput);
 
+    //// Mengupdate dari body ke req.user
+    Object.assign(req.user, body);
+    await req.user.save();
     //// Logic disini     req.user  => sudah ada
     return reply
       .status(201)
-      .send({ status: true, body, message: "Berhasil auth" });
+      .send({ status: true, body, message: "Data kamu berhasil di ubah" });
   } catch (err) {
     const { codeStatus, status, message } = await handleServerResponseError(
       err
@@ -33,7 +36,7 @@ const pengguna_delete = async (req, reply) => {
   if (req.user.id === userId && req.user.role == "Admin") {
     return reply
       .status(403)
-      .send({ status: false, message: "Tidak bisa hapus akun sendiri" });
+      .send({ status: false, message: "Admin tidak bisa hapus akun sendiri" });
   }
 
   const deleted = await User.findByIdAndDelete(userId);
@@ -51,7 +54,10 @@ const pengguna_delete = async (req, reply) => {
     ipAddress: req.ip,
     userAgent: req.headers["user-agent"],
   });
-  return reply.status(200).send({ status: true, message: "Belum tersedia" });
+  return reply.status(200).send({
+    status: true,
+    message: `User dengan ID ${deleted._id} telah dihapus`,
+  });
 };
 
 module.exports = {
