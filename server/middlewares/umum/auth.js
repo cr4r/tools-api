@@ -1,11 +1,5 @@
 const root_path = process.env.ROOT_PATH;
-const refresh_token_secret = process.env.REFRESH_TOKEN_SECRET;
-const access_token_secret = process.env.ACCESS_TOKEN_SECRET;
-const access_token_exp = process.env.ACCESS_TOKEN_EXPIRY;
-const refresh_token_exp = process.env.REFRESH_TOKEN_EXPIRY;
-
-const jwt = require("jsonwebtoken");
-const { User, HistoryLogin } = require(`${root_path}/models`);
+const { User } = require(`${root_path}/models`);
 const { verifyToken, getTokenReq } = require(`${root_path}/services`);
 
 const isAdmin = async (req, reply, done) => {
@@ -68,6 +62,16 @@ function verifyTokenAndRole(allowedRolesStr, typeToken = "access") {
         .code(401)
         .send({ status: false, message: "User tidak ditemukan" });
     // Masukkan data user ke request untuk digunakan di controller berikutnya
+
+    const isEmail = message.email !== user.email;
+    const isFullName = message.fullName !== user.fullName;
+
+    if (isEmail || isFullName) {
+      return reply.status(401).send({
+        status: false,
+        message: "Token sudah tidak valid lagi, silahkan refresh token",
+      });
+    }
 
     // Memeriksa role yang dibutuhkan (admin.user atau admin saja)
     // Proses role // Memecah role, misalnya admin.user

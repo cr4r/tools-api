@@ -9,7 +9,7 @@
   },
   "pengguna": {
     "registrasi": {
-      "url": "/registrasi"
+      "url": "/register"
     },
     "login": {
       "url": "/login"

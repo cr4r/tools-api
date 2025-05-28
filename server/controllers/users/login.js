@@ -54,7 +54,8 @@ const login_post = async (req, reply) => {
     .code(200)
     .header("x-auth-token", accessToken) // opsional, kalau client ingin ambil dari header
     .send({
-      message: "Login berhasil",
+      status: true,
+      message: "Login berhasil!",
       accessToken, // ini yang akan dipakai oleh aplikasi Android
       refreshToken: refreshToken.token,
     });

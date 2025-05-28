@@ -1,0 +1,129 @@
+Berikut adalah **ringkasan lengkap dan detail** seluruh obrolan sebelumnya, agar kamu bisa **lanjut di sesi baru tanpa kehilangan konteks** atau menyebabkan miskomunikasi:
+
+---
+
+## ⚙️ **Struktur Proyek**
+
+* **Framework**: Fastify v5
+* **Database**: MongoDB (mongoose v8.9.2)
+* **Autentikasi**: JWT (access & refresh token), hashed token, JTI, dan audit
+* **Keamanan**:
+
+  * Access token tidak disimpan di DB
+  * Refresh token disimpan di DB (dihash)
+  * Multi-device login (1 user bisa banyak token dengan device berbeda)
+  * Token kadaluarsa otomatis (`expiryDate` + TTL index)
+  * Role-based access (admin, user)
+* **Standar Token**: Wajib pakai `Authorization: Bearer <token>`
+  (optional (pakai `x-auth-token`), tidak pakai body, atau query untuk keamanan)
+
+---
+
+## 🔐 **Login Flow**
+
+1. User login → email dan password dicek
+2. Refresh token lama dari device sama dihapus
+3. Access dan refresh token dibuat:
+
+   * `accessToken` = JWT + exp + jti + issuer + audience
+   * `refreshToken` = JWT + exp + jti
+4. Refresh token disimpan ke DB (`HistoryLogin`) dalam bentuk **hash**
+5. Response:
+
+   ```json
+   {
+	 "status": true,
+	 "message":"...", 
+     "accessToken": "...",
+     "refreshToken": "..."
+   }
+   ```
+6. Client harus simpan dan kirim token via:
+
+   ```http
+   Authorization: Bearer <accessToken>
+   ```
+
+---
+
+## 🧠 `verifyTokenAndRole(roleString, typeToken = "access")`
+
+Middleware universal untuk:
+
+* Verifikasi token dari `Authorization: Bearer ...`
+* Ambil token dari helper `getTokenReq(req)`
+* Cek `issuer`, `audience`, dan `expired` otomatis via `jwt.verify`
+* Ambil user dari DB berdasarkan token (`message.id`)
+* Cek role:
+
+  * `"admin"` → akses penuh jika diizinkan
+  * `"user"` → hanya bisa akses `req.params.id === user._id`
+  * Role string `"admin.user"` → admin boleh semua, user hanya data sendiri
+
+---
+
+## 📦 `getTokenReq(req)`
+
+Mengambil token dari:
+
+* `Authorization: Bearer ...`
+* (fallback `x-auth-token` tapi tidak direkomendasikan)
+* Tidak ambil dari body/query karena tidak aman untuk DELETE/GET
+
+---
+
+## 🔒 Audit Log Hapus User
+
+* Admin bisa hapus user via `DELETE /user/:id`
+* Sistem:
+
+  * Cek role admin
+  * Tidak boleh hapus diri sendiri
+  * Simpan log ke `UserAuditLog`:
+
+    * `performedBy`: admin ID
+    * `targetUser`: user ID yang dihapus
+    * `ipAddress`, `userAgent`, `createdAt`
+
+---
+
+## 🚫 Penghapusan Diri Sendiri
+
+* Tidak boleh dilakukan via route admin (`/user/:id`)
+* Kalau ingin fitur hapus diri sendiri, disarankan route terpisah: `DELETE /me`
+
+---
+
+## 📦 `generateAccessToken(user)` & `generateRefreshToken(user)`
+
+* Menggunakan:
+
+  * `issuer: "coders.family.api"`
+  * `audience: "coders.family.app"`
+  * `expiresIn` dari `.env`
+  * `jti` = UUID (digunakan untuk validasi/hapus refresh token)
+
+---
+
+## ✅ Pengambilan Token Aman:
+
+Gunakan `Authorization: Bearer ...` di semua route
+Contoh REST Client VS Code:
+
+```http
+DELETE {{hostname}}/user/665... HTTP/1.1
+Authorization: Bearer eyJhbGciOi...
+```
+
+---
+
+## 🧾 Best Practice Tambahan:
+
+* Token hanya dikirim lewat header
+* Token tidak dikirim kembali oleh server via header (`x-auth-token`)
+* `verifyToken` wrapper menggunakan `try-catch` + kode status 401/403
+* TTL index dipakai untuk otomatis hapus refresh token dari DB saat `expiryDate` lewat
+
+---
+
+

@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const bcryptjs = require("bcryptjs");
 const { capitalizeCase } = require(`${root_path}/services`);
 
-let typeUser = ["Admin", "User", "Team"];
+let typeUser = ["Admin", "User", "Owner", "Developer"];
 
 const UserSchema = new mongoose.Schema(
   {

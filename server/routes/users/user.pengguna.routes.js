@@ -5,11 +5,23 @@ const {
   verifyTokenAndRole,
   schemaValidatorUser,
 } = require(`${root_path}/middlewares`);
-const { pengguna_put, pengguna_delete } = require(`${root_path}/controllers`);
+const {
+  pengguna_put,
+  pengguna_delete,
+  pengguna_get,
+} = require(`${root_path}/controllers`);
 const { userUpdateSchema } = require(`${root_path}/schemas`);
+const { rateLimitConfig } = require(`${root_path}/services`);
 
 async function userPenggunaRoutes(fastify, options) {
   // Kelola user
+  fastify.get(
+    pengguna.user.url + "/:id",
+    {
+      preHandler: [verifyTokenAndRole("admin.user")],
+    },
+    pengguna_get
+  );
   fastify.put(
     pengguna.user.url,
     {
@@ -17,12 +29,16 @@ async function userPenggunaRoutes(fastify, options) {
         verifyTokenAndRole("admin.user"),
         schemaValidatorUser(userUpdateSchema),
       ],
+      config: rateLimitConfig(),
     },
     pengguna_put
   );
   fastify.delete(
     pengguna.user.url + "/:id?",
-    { preHandler: verifyTokenAndRole("admin.user") },
+    {
+      preHandler: verifyTokenAndRole("admin.user"),
+      config: rateLimitConfig(),
+    },
     pengguna_delete
   );
 }

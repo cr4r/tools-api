@@ -66,10 +66,7 @@ fastify.register(fastifyMultipart, {
 });
 
 // Mengonfigurasi rate limit
-fastify.register(fastify_limit, {
-  max: 5, // Maksimal 100 permintaan
-  timeWindow: "1 minute", // Dalam 1 menit
-});
+fastify.register(fastify_limit);
 
 // Headers Handler
 fastify.register(fastifyCors, {
@@ -79,6 +76,7 @@ fastify.register(fastifyCors, {
       "https://localhost:3000",
       "http://localhost",
       "http://192.168.10.15:3000",
+      "http://localhost:53463",
       "http://192.168.10.15",
     ];
 
@@ -144,6 +142,13 @@ fastify.register(fStatic, {
   root: path.join(__dirname, "public/assets"),
   prefix: "/assets/",
 });
+
+//// untuk web
+// fastify.register(fStatic, {
+//   root: path.join(__dirname, "public/web"),
+//   prefix: "/",
+//   decorateReply: false,
+// });
 //=====================================================================================//
 
 //=====================================================================================//

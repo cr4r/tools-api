@@ -4,7 +4,7 @@ const {
   sanitizeInput,
   verifyToken,
 } = require(`${root_path}/services`);
-const { User, UserAuditLog } = require(`${root_path}/models`);
+const { User, UserAuditLog, HistoryLogin } = require(`${root_path}/models`);
 const bcryptjs = require("bcryptjs");
 
 const pengguna_put = async (req, reply) => {
@@ -60,7 +60,34 @@ const pengguna_delete = async (req, reply) => {
   });
 };
 
+//// Mengambil semua aktivitas user yang login
+const pengguna_get = async (req, reply) => {
+  console.log("gass");
+  const cariIdUser = req.params.id;
+  const userToken = req.user;
+
+  if (userToken.role === "User" && userToken._id !== cariIdUser) {
+    return reply.status(403).send({
+      status: false,
+      message: "Anda tidak mempunyai akses untuk melihat user lain",
+    });
+  }
+
+  // Ambil login history dan gunakan lean() agar hasilnya plain JS object (lebih ringan)
+  const historyLogin = await HistoryLogin.find({ userId: cariIdUser }).lean();
+
+  // Proses hasil untuk ambil field yang dibutuhkan
+  const hasilFilter = historyLogin.map((item) => ({
+    akun: item.userId,
+    deviceInfo: item.deviceInfo,
+    expiredDate: item.expiryDate,
+  }));
+
+  reply.status(200).send({ status: true, message: "OK", data: hasilFilter });
+};
+
 module.exports = {
   pengguna_put,
   pengguna_delete,
+  pengguna_get,
 };
