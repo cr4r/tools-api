@@ -73,3 +73,8 @@ Authorization:Bearer {{accessToken}}
 # @name get_ativity_login
 GET {{hostname}}/user/6823f464c0f3503266b454a2 HTTP/1.1
 Authorization:Bearer {{accessToken}}
+
+###
+# @name get_all_info_account
+GET {{hostname}}/user HTTP/1.1
+Authorization:Bearer {{accessToken}}

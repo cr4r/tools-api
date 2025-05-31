@@ -4,6 +4,7 @@ const {
   hashToken,
   verifyToken,
   generateAccessToken,
+  handleServerResponseError,
 } = require(`${root_path}/services`);
 
 //// UNTUK REFRESH TOKEN, AKSES TOKEN BARU
@@ -55,6 +56,28 @@ const user_token_post = async (req, reply) => {
   }
 };
 
+const user_history_delete = async (req, reply) => {
+  const userId = req.params.id;
+  try {
+    const historyDelete = await HistoryLogin.findByIdAndDelete(userId);
+    if (!historyDelete) {
+      return reply
+        .status(404)
+        .send({ status: false, message: "User tidak ditemukan" });
+    }
+    return reply.status(200).send({
+      status: true,
+      message: `User dengan ID ${historyDelete._id} telah dihapus`,
+    });
+  } catch (err) {
+    const { codeStatus, status, message } = await handleServerResponseError(
+      err
+    );
+    return reply.status(codeStatus).send({ status, message });
+  }
+};
+
 module.exports = {
   user_token_post,
+  user_history_delete,
 };

@@ -61,11 +61,15 @@ function verifyTokenAndRole(allowedRolesStr, typeToken = "access") {
       return reply
         .code(401)
         .send({ status: false, message: "User tidak ditemukan" });
-    // Masukkan data user ke request untuk digunakan di controller berikutnya
 
+    // Mengecek kesamaan data token dan database, jika berbeda maka tolak
     const isEmail = message.email !== user.email;
     const isFullName = message.fullName !== user.fullName;
-
+    console.log(
+      `token : ${message.fullName}, DB: ${user.fullName}\n${JSON.stringify(
+        req.headers
+      )}`
+    );
     if (isEmail || isFullName) {
       return reply.status(401).send({
         status: false,
@@ -73,6 +77,7 @@ function verifyTokenAndRole(allowedRolesStr, typeToken = "access") {
       });
     }
 
+    // Masukkan data user ke request untuk digunakan di controller berikutnya
     // Memeriksa role yang dibutuhkan (admin.user atau admin saja)
     // Proses role // Memecah role, misalnya admin.user
     const allowedRoles = allowedRolesStr.split(".").map((r) => r.toLowerCase());

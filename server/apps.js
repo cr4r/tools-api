@@ -75,9 +75,12 @@ fastify.register(fastifyCors, {
       "http://localhost:3000",
       "https://localhost:3000",
       "http://localhost",
-      "http://192.168.10.15:3000",
       "http://localhost:53463",
-      "http://192.168.10.15",
+      "http://192.168.1.15",
+      "http://192.168.1.15:3000",
+      "http://192.168.1.222:3000",
+      "http://localhost:51933",
+      "http://localhost:52121",
     ];
 
     if (!origin || allowedOrigins.includes(origin)) {

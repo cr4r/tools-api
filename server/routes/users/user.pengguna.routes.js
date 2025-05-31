@@ -16,9 +16,10 @@ const { rateLimitConfig } = require(`${root_path}/services`);
 async function userPenggunaRoutes(fastify, options) {
   // Kelola user
   fastify.get(
-    pengguna.user.url + "/:id",
+    pengguna.user.url,
     {
-      preHandler: [verifyTokenAndRole("admin.user")],
+      preHandler: [verifyTokenAndRole("admin.owner.developer")],
+      config: rateLimitConfig(),
     },
     pengguna_get
   );
