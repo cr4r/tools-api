@@ -6,6 +6,7 @@
  */
 function sanitizeInput(data, allowedFields) {
   const sanitized = {};
+
   for (const key of allowedFields) {
     if (data.hasOwnProperty(key)) {
       sanitized[key] = data[key];

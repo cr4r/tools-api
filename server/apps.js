@@ -15,7 +15,7 @@ const mongoose = require("mongoose");
 // Session and cookie with mongo
 const fastifyCors = require("@fastify/cors");
 // const fastifySession = require("@fastify/session");
-// const fastifyCookie = require("@fastify/cookie");
+const fastifyCookie = require("@fastify/cookie");
 const fastifyFormbody = require("@fastify/formbody");
 const fastifyMultipart = require("@fastify/multipart");
 const fastify_limit = require("@fastify/rate-limit");
@@ -73,31 +73,28 @@ fastify.register(fastifyCors, {
   origin: (origin, cb) => {
     const allowedOrigins = [
       "http://localhost:3000",
-      "https://localhost:3000",
-      "http://localhost",
-      "http://localhost:53463",
       "http://192.168.1.15",
       "http://192.168.1.15:3000",
-      "http://192.168.1.222:3000",
-      "http://localhost:51933",
-      "http://localhost:52121",
+      "http://192.168.1.1:3000",
+      "http://192.168.1.222",
+      "http://localhost:4000",
+      "https://openwrt.local:3001",
     ];
-
+    console.log(origin);
     if (!origin || allowedOrigins.includes(origin)) {
       cb(null, true);
     } else {
-      cb(new Error("Not allowed by CORS"), false);
+      cb(new Error("Origin not allowed"), false);
     }
   },
-  methods: ["GET", "POST", "PUT", "DELETE"], // allow these methods
-  // headers: true, // allow headers
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // allow these methods
   credentials: true, // allow credentials,
   allowedHeaders: ["Content-Type", "Authorization", "x-auth-token"],
   optionsSuccessStatus: 204, // Untuk menangani preflight di browser lama
-  // exposedHeaders: ["Coders-Family"],
-  bodyParser: {
-    json: true,
-  },
+  exposedHeaders: ["x-auth-token", "authorization"],
+  // bodyParser: {
+  //   json: true,
+  // },
 });
 
 // Custom Header global
@@ -117,7 +114,11 @@ fastify.register(require("@fastify/ajv-compiler"), {
 // register Form data parsing
 fastify.register(fastifyFormbody);
 // Setup Cookie dan Session
-// fastify.register(fastifyCookie);
+fastify.register(fastifyCookie, {
+  secret: process.env.COOKIE_SECRET || "123-123ed-sdfjvn-12dsvds", // untuk signed cookie
+  hook: "onRequest",
+});
+
 // fastify.register(fastifySession, {
 //   key: "user_sid",
 //   secret:
@@ -157,6 +158,10 @@ fastify.register(fStatic, {
 //=====================================================================================//
 //Setup URL (Routing)
 //
+// fastify.addHook("onRequest", (req, reply, done) => {
+//   console.log("Cookies?", req.cookies); // <- harusnya tampil
+//   done();
+// });
 fastify.register(YoutubeRoutes, { prefix: "/tools" });
 fastify.register(userRegistrasiRoutes, { prefix: "/" });
 fastify.register(userTokenRoutes, { prefix: "/" });

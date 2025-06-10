@@ -1,4 +1,10 @@
 {
+  "roleUser": [
+    "Owner",
+    "Developer",
+    "Admin",
+    "User"
+  ],
   "root": {
     "url": "/"
   },

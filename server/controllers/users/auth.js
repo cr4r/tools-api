@@ -8,39 +8,34 @@ const {
 } = require(`${root_path}/services`);
 
 //// UNTUK REFRESH TOKEN, AKSES TOKEN BARU
-const user_token_post = async (req, reply) => {
-  //// Token = Refresh Token
-  const { token } = req.body;
-  if (!token)
+const user_token_refresh = async (req, reply) => {
+  const token = req.cookies?.refresh_token || req.query?.token;
+  console.log("Saat melakukan refresh token (Cookie) ====>", token);
+  if (!token) {
     return reply
       .code(401)
-      .send({ status: false, message: "Token refresh diperlukan" });
-  const saved = await HistoryLogin.findOne({ token: hashToken(token) });
-  if (!saved)
-    return reply
-      .code(403)
-      .send({ error: "Token tidak valid atau sudah dicabut" });
+      .send({ status: false, message: "Refresh token tidak ditemukan" });
+  }
 
   try {
-    ////GUNAKAN REFRESH TOKEN UNTUK TOKENNYA
-    const { status, message, codeStatus } = verifyToken(token, "refresh");
-    if (status == false)
-      return reply.status(codeStatus).send({ status, message });
+    const saved = await HistoryLogin.findOne({ token: hashToken(token) });
+    if (!saved)
+      return reply
+        .code(403)
+        .send({ error: "Token tidak valid atau sudah dicabut" });
 
-    //// AMBIL DATA USER SESUAIKAN DENGAN ID YANG ADA DI REFRESH TOKEN
+    const { status, message, codeStatus } = verifyToken(token, "refresh");
+    if (!status) return reply.status(codeStatus).send({ status, message });
+
     const user = await User.findById(message.id);
     if (!user) {
-      //// GUNAKAN LOGIC DISINI UNTUK HAPUS APA SAJA JIKA USER TIDAK ADA
-      // Hapus seluruh token refresh milik user ini
       await HistoryLogin.deleteMany({ userId: message.id });
-
       return reply
         .status(401)
         .send({ status: false, message: "User tidak ada atau sudah terhapus" });
     }
 
-    //// JIKA VALID, MAKA BUAT ACCESS TOKEN BARU
-    const newAccessToken = generateAccessToken(user);
+    const newAccessToken = generateAccessToken(user, saved.jti);
 
     return reply.status(201).send({
       status: true,
@@ -48,7 +43,7 @@ const user_token_post = async (req, reply) => {
       token: newAccessToken,
     });
   } catch (err) {
-    console.log(err);
+    console.error(err);
     return reply.code(403).send({
       status: false,
       message: "Refresh Token tidak valid atau kadaluarsa",
@@ -78,6 +73,6 @@ const user_history_delete = async (req, reply) => {
 };
 
 module.exports = {
-  user_token_post,
+  user_token_refresh,
   user_history_delete,
 };

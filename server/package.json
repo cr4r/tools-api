@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/cr4r/Tools#readme",
   "dependencies": {
+    "@fastify/cookie": "^11.0.2",
     "@fastify/cors": "^10.0.1",
     "@fastify/formbody": "^8.0.1",
     "@fastify/helmet": "^13.0.1",

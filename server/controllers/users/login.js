@@ -5,6 +5,7 @@ const {
   expiryDateToken,
   verifyToken,
   hashToken,
+  optionCookie,
 } = require(`${root_path}/services`);
 const { User, HistoryLogin } = require(`${root_path}/models/users`);
 
@@ -24,7 +25,8 @@ const login_post = async (req, reply) => {
       .code(401)
       .send({ status: false, message: "Password tidak ada" });
   const isMatch = await user.comparePassword(password);
-  if (!isMatch) return reply.code(401).send({ error: "Password salah" });
+  if (!isMatch)
+    return reply.code(401).send({ status: false, message: "Password salah" });
 
   //// Hapus semua token user jika device sama saat login
   const userAgent = req.headers["user-agent"] || "Unknown";
@@ -37,7 +39,9 @@ const login_post = async (req, reply) => {
 
   //// Membuat akses dan refresh token yang baru
   const refreshToken = await generateRefreshToken(user);
-  const accessToken = await generateAccessToken(user);
+
+  //// tambahkan JTI (penanda refresh token)
+  const accessToken = await generateAccessToken(user, refreshToken.jti);
 
   //// Simpan Refresh Token User ke database di HistoryLogin
   await HistoryLogin.create({
@@ -50,20 +54,23 @@ const login_post = async (req, reply) => {
     expiryDate: expiryDateToken("refresh"),
   });
 
-  reply
-    .code(200)
-    .header("x-auth-token", accessToken) // opsional, kalau client ingin ambil dari header
+  console.log("optionCookie", optionCookie());
+  return reply
+    .setCookie("refresh_token", refreshToken.token, optionCookie())
+    .header("Authorization", `Bearer ${accessToken}`)
     .send({
       status: true,
       message: "Login berhasil!",
       accessToken, // ini yang akan dipakai oleh aplikasi Android
-      refreshToken: refreshToken.token,
+      // refreshToken: refreshToken.token,
     });
 };
 
 const logout_post = async (req, reply) => {
-  const { token } = req.body;
+  // const { token } = req.body;
+  const token = req.cookies?.refresh_token;
 
+  console.log(req.cookies);
   if (!token)
     return reply.status(400).send({
       status: false,
@@ -95,7 +102,7 @@ const logout_post = async (req, reply) => {
     });
   }
 
-  return reply.status(200).send({
+  return reply.clearCookie("refresh_token", { path: "/" }).status(200).send({
     status: true,
     message: "Logout berhasil, token lama telah dihapus",
   });

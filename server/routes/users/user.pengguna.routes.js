@@ -1,6 +1,5 @@
-const configFile = process.env.CONFIG_FILE;
 const root_path = process.env.ROOT_PATH;
-const { pengguna } = require(configFile);
+const { pengguna } = require(process.env.CONFIG_FILE);
 const {
   verifyTokenAndRole,
   schemaValidatorUser,

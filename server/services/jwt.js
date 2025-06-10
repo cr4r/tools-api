@@ -13,7 +13,7 @@ Refresh Token (setelah login) digunakan untuk mendapatkan akses token serta log 
 let issuer = "coders.family.api";
 let audience = "coders.family.app";
 
-function generateAccessToken(user) {
+function generateAccessToken(user, jti = uuidv4()) {
   const { _id, email, role, fullName } = user;
   return jwt.sign(
     {
@@ -21,6 +21,7 @@ function generateAccessToken(user) {
       email,
       role,
       fullName,
+      jti,
       iat: Math.floor(Date.now() / 1000),
     },
     access_token_secret,
@@ -34,7 +35,6 @@ function generateAccessToken(user) {
 
 function generateRefreshToken(user) {
   const jti = uuidv4(); // ID unik token
-
   let token = jwt.sign(
     {
       id: user._id,
@@ -80,13 +80,15 @@ const expiryDateToken = (jenis) => {
     : new Date(Date.now() + ms(access_token_exp));
 };
 
-const getTokenReq = (req) => {
+const getTokenReq = (req, cookieKey = null) => {
   const authHeader = req.headers["authorization"]?.trim();
   let headAuth = authHeader?.startsWith("Bearer ")
     ? authHeader.split(" ")[1]
     : undefined;
 
+  const reqCookie = cookieKey && req.cookies?.[cookieKey];
   return (
+    reqCookie ||
     req.headers["x-auth-token"] ||
     headAuth ||
     req.body?.token ||

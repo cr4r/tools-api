@@ -3,10 +3,8 @@ const {
   handleServerResponseError,
   sanitizeInput,
   generateAccessToken,
-  verifyToken,
 } = require(`${root_path}/services`);
 const { User, UserAuditLog, HistoryLogin } = require(`${root_path}/models`);
-const bcryptjs = require("bcryptjs");
 
 const pengguna_get = async (req, reply) => {
   try {
@@ -41,44 +39,70 @@ const pengguna_get = async (req, reply) => {
 
 const pengguna_put = async (req, reply) => {
   try {
-    const allowInput = ["email", "password", "fullName"];
-    const body = await sanitizeInput(req.body, allowInput);
+    let updatedUser;
+    const userIdQuery = req.query.userId;
+    const currentUser = req.user;
+    const isAdminEditingOtherUser =
+      userIdQuery && ["Admin", "Owner", "Developer"].includes(currentUser.role);
+    const allowedFields = isAdminEditingOtherUser
+      ? ["email", "password", "fullName", "role"]
+      : ["email", "password", "fullName"];
+    const updates = await sanitizeInput(req.body, allowedFields);
 
-    const idUser = req.params.user;
-    let hasil;
+    if (isAdminEditingOtherUser) {
+      console.log("💼 Mode Admin: Editing user lain", updates);
 
-    if (idUser && req.user.role === "Admin") {
-      // Admin ingin mengedit user lain
-      if (Object.keys(body).length > 0) {
-        hasil = await User.findByIdAndUpdate(idUser, body, {
+      // Batasi pengubahan role
+      const isAdmin =
+        currentUser.role == "Admin" && ["Admin", "User"].includes(updates.role);
+      const isDeveloper =
+        currentUser.role == "Developer" &&
+        ["Developer", "Admin", "User"].includes(updates.role);
+
+      if (isAdmin) {
+        return reply.code(403).send({
+          status: false,
+          message: `Admin tidak punya akses untuk mengubah role ke ${updates.role}`,
+        });
+      } else if (isDeveloper) {
+        return reply.code(403).send({
+          status: false,
+          message: `Developer tidak punya akses untuk mengubah role ke ${updates.role}`,
+        });
+      }
+
+      // Proses edit data
+      if (Object.keys(updates).length > 0) {
+        updatedUser = await User.findByIdAndUpdate(userIdQuery, updates, {
           new: true,
           runValidators: true,
         });
       } else {
-        hasil = await User.findById(idUser); // tidak ada perubahan
+        updatedUser = await User.findById(userIdQuery); // Ga ada update, ambil aja datanya
       }
     } else {
-      // User biasa mengedit dirinya sendiri
-      let changed = false;
+      console.log("👤 Mode User Biasa: Edit diri sendiri");
 
-      for (let key of Object.keys(body)) {
-        if (req.user[key] !== body[key]) {
-          req.user[key] = body[key];
-          changed = true;
+      // Apply changes hanya kalau ada yang beda
+      let hasChanges = false;
+      for (const key of Object.keys(updates)) {
+        if (currentUser[key] !== updates[key]) {
+          currentUser[key] = updates[key];
+          hasChanges = true;
         }
       }
 
-      hasil = changed ? await req.user.save() : req.user;
+      updatedUser = hasChanges ? await currentUser.save() : currentUser;
     }
 
-    if (!hasil) {
+    if (!updatedUser) {
       return reply.code(404).send({
         status: false,
         message: "User tidak ditemukan",
       });
     }
 
-    const token = await generateAccessToken(hasil); // hasil digunakan di semua kasus
+    const token = await generateAccessToken(updatedUser);
 
     return reply.code(200).send({
       status: true,

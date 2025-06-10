@@ -1,10 +1,9 @@
 const root_path = process.env.ROOT_PATH;
+const { roleUser } = require(process.env.CONFIG_FILE);
 
 const mongoose = require("mongoose");
 const bcryptjs = require("bcryptjs");
 const { capitalizeCase } = require(`${root_path}/services`);
-
-let typeUser = ["Admin", "User", "Owner", "Developer"];
 
 const UserSchema = new mongoose.Schema(
   {
@@ -22,7 +21,7 @@ const UserSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: typeUser,
+      enum: roleUser,
       default: "Admin",
       trim: true,
     },
@@ -49,7 +48,7 @@ const encryptPassword = async (password, jumSalt = 5) => {
 UserSchema.pre("save", async function (next) {
   try {
     // Jika role bukan ["Admin", "User", "Team"];
-    if (this.isModified("role") && !typeUser.includes(this.role)) {
+    if (this.isModified("role") && !roleUser.includes(this.role)) {
       console.log(
         "Ada yang mencoba mengubah alur role yang telah ditetapkan!!!"
       );
@@ -80,7 +79,7 @@ UserSchema.pre(
     }
 
     // Jika role tidak sama yang telah ditentukan
-    if (data.role && !typeUser.includes(data.role)) {
+    if (data.role && !roleUser.includes(data.role)) {
       delete data.role;
     }
 

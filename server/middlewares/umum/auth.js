@@ -19,7 +19,9 @@ const isAdmin = async (req, reply, done) => {
   req.user = message;
 
   if (req.user.role !== "Admin")
-    return reply.code(403).send({ error: "Akses khusus admin" });
+    return reply
+      .code(403)
+      .send({ status: false, message: "Akses khusus admin" });
 };
 
 const auth = async (req, reply, done) => {
@@ -41,6 +43,7 @@ const auth = async (req, reply, done) => {
 
 function verifyTokenAndRole(allowedRolesStr, typeToken = "access") {
   return async function (req, reply) {
+    console.log(req.cookies["refresh_token"]);
     // Ambil token dari berbagai sumber (header, body, query)
     const token = getTokenReq(req);
     if (!token) {
@@ -65,11 +68,6 @@ function verifyTokenAndRole(allowedRolesStr, typeToken = "access") {
     // Mengecek kesamaan data token dan database, jika berbeda maka tolak
     const isEmail = message.email !== user.email;
     const isFullName = message.fullName !== user.fullName;
-    console.log(
-      `token : ${message.fullName}, DB: ${user.fullName}\n${JSON.stringify(
-        req.headers
-      )}`
-    );
     if (isEmail || isFullName) {
       return reply.status(401).send({
         status: false,

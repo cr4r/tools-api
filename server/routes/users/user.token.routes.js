@@ -3,7 +3,7 @@ const root_path = process.env.ROOT_PATH;
 const { pengguna } = require(configFile);
 
 const {
-  user_token_post,
+  user_token_refresh,
   user_history_delete,
   history_get,
 } = require(`${root_path}/controllers`);
@@ -16,15 +16,15 @@ async function userTokenRoutes(fastify, options) {
   fastify.get(
     pengguna.user.url + "/history/:id",
     {
-      preHandler: [verifyTokenAndRole("admin.user")],
+      preHandler: verifyTokenAndRole("admin.user"),
       config: rateLimitConfig({ userLimit: 10 }),
     },
     history_get
   );
-  fastify.post(
+  fastify.get(
     pengguna.user.url + "/refresh",
     { config: rateLimitConfig() },
-    user_token_post
+    user_token_refresh
   );
   fastify.delete(
     pengguna.user.url + "/history/:id",

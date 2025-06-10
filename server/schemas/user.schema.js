@@ -1,5 +1,6 @@
 // file: validations/userValidation.js
 const { z } = require("zod");
+const { roleUser } = require(process.env.CONFIG_FILE);
 
 const baseUserSchema = z.object({
   fullName: z
@@ -8,9 +9,20 @@ const baseUserSchema = z.object({
     .regex(/^[A-Za-z\s]+$/, {
       message: "Nama lengkap hanya boleh huruf dan spasi",
     }),
-  email: z.string().email({ message: "Email tidak valid" }),
+  email: z
+    .string()
+    .email({ message: "Email tidak valid" })
+    .refine(
+      (val) => {
+        const localPart = val.split("@")[0];
+        return localPart.length >= 3;
+      },
+      {
+        message: "user email biasanya minimal 3 karakter",
+      }
+    ),
   password: z.string().min(3, { message: "Password minimal 3 karakter" }),
-  role: z.enum(["Admin", "User"]).optional(),
+  role: z.enum(roleUser).optional(),
 });
 
 // 👇 Registrasi: semua wajib

@@ -3,10 +3,12 @@ const schemaValidatorUser = (schema) => {
     try {
       req.body = schema.parse(req.body); // overwrite req.body agar sudah divalidasi
     } catch (err) {
+      const errorMsg = err.errors.map((e) => e.message);
+      console.log(errorMsg, err);
       return reply.code(400).send({
         status: false,
         message: "Validasi gagal",
-        error: err.errors.map((e) => e.message),
+        error: errorMsg,
       });
     }
   };
