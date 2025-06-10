@@ -1,5 +1,5 @@
-const root_path = process.env.ROOT_PATH;
-const { roleUser } = require(process.env.CONFIG_FILE);
+const root_path = process.cwd();
+const { roleUser } = require(root_path + '/' + process.env.CONFIG_FILE);
 
 const mongoose = require("mongoose");
 const bcryptjs = require("bcryptjs");

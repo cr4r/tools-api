@@ -4,12 +4,12 @@
 // Initialize Module
 const { root, tools } = require("./config.json");
 require("dotenv").config();
-const fastify = require("fastify")({ logger: true });
 //=====================================================================================//
 // const fView = require("@fastify/view");
 const fStatic = require("@fastify/static");
 // const ejs = require("ejs");
 const path = require("path");
+const fs = require("fs");
 //=====================================================================================//
 const mongoose = require("mongoose");
 // Session and cookie with mongo
@@ -32,7 +32,19 @@ const {
   userPenggunaRoutes,
 } = require("./routes");
 
+
 //=====================================================================================//
+
+// Baca sertifikat SSL
+const httpsOptions = {
+  key: fs.readFileSync(path.join(__dirname, '../ssl', 'key.pem')),
+  cert: fs.readFileSync(path.join(__dirname, '../ssl', 'cert.pem'))
+};
+
+const fastify = require("fastify")({ logger: true,https: httpsOptions });
+
+//// Tarok root_path di fastify (fastify.root_path;)
+fastify.decorate('root_path', process.cwd());
 
 //=====================================================================================//
 // function connect Database
@@ -193,7 +205,7 @@ const start = async (app) => {
     // Memulai server
     await app.listen({
       host: "0.0.0.0",
-      port: process.env.PORT || 3000,
+      port: process.env.PORT || 5000,
     });
     await app.ready(); // pastikan server siap
 

@@ -1,5 +1,5 @@
-const configFile = process.env.CONFIG_FILE;
-const { tools, root } = require(configFile);
+const root_path = process.cwd();
+const { root, tools } = require(root_path + '/' + process.env.CONFIG_FILE);
 
 const Info = async (req, rep) => {
   return {

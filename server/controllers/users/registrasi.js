@@ -1,8 +1,7 @@
-const root_path = process.env.ROOT_PATH;
+const root_path = process.cwd();
 const {
   handleServerResponseError,
   sanitizeInput,
-  validateInputUser,
 } = require(`${root_path}/services`);
 
 const { User } = require(`${root_path}/models`);

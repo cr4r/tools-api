@@ -1,4 +1,4 @@
-const root_path = process.env.ROOT_PATH;
+const root_path = process.cwd();
 const mongoose = require("mongoose");
 
 const UserAuditLogSchema = new mongoose.Schema({

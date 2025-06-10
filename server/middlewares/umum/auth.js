@@ -1,4 +1,4 @@
-const root_path = process.env.ROOT_PATH;
+const root_path = process.cwd();
 const { User } = require(`${root_path}/models`);
 const { verifyToken, getTokenReq } = require(`${root_path}/services`);
 

@@ -1,6 +1,7 @@
 // file: validations/userValidation.js
 const { z } = require("zod");
-const { roleUser } = require(process.env.CONFIG_FILE);
+const root_path = process.cwd();
+const { roleUser } = require(root_path + '/' + process.env.CONFIG_FILE);
 
 const baseUserSchema = z.object({
   fullName: z
