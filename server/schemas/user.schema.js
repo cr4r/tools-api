@@ -1,7 +1,7 @@
 // file: validations/userValidation.js
 const { z } = require("zod");
 const root_path = process.cwd();
-const { roleUser } = require(root_path + '/' + process.env.CONFIG_FILE);
+const { roleUser } = require(root_path + "/" + process.env.CONFIG_FILE);
 
 const baseUserSchema = z.object({
   fullName: z
@@ -24,6 +24,7 @@ const baseUserSchema = z.object({
     ),
   password: z.string().min(3, { message: "Password minimal 3 karakter" }),
   role: z.enum(roleUser).optional(),
+  foto: z.string().optional(),
 });
 
 // 👇 Registrasi: semua wajib

@@ -1,5 +1,5 @@
 const root_path = process.cwd();
-const { pengguna } = require(root_path + '/' + process.env.CONFIG_FILE);
+const { pengguna } = require(root_path + "/" + process.env.CONFIG_FILE);
 const {
   verifyTokenAndRole,
   schemaValidatorUser,

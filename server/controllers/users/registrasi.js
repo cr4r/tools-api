@@ -17,12 +17,13 @@ const registrasi_post = async (req, reply) => {
     return reply.status(200).send({
       status: true,
       data: { fullName, email },
-      message: "ok berhasil terdaftar",
+      message: "Akun anda telah dibuat",
     });
   } catch (err) {
     const { codeStatus, status, message } = await handleServerResponseError(
       err
     );
+    console.log(message);
     return reply.status(codeStatus).send({ status, message });
   }
 };

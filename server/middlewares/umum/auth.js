@@ -43,7 +43,6 @@ const auth = async (req, reply, done) => {
 
 function verifyTokenAndRole(allowedRolesStr, typeToken = "access") {
   return async function (req, reply) {
-    console.log(req.cookies["refresh_token"]);
     // Ambil token dari berbagai sumber (header, body, query)
     const token = getTokenReq(req);
     if (!token) {
@@ -99,6 +98,7 @@ function verifyTokenAndRole(allowedRolesStr, typeToken = "access") {
     }
     // Masukkan data user ke request untuk digunakan di controller berikutnya
     req.user = user;
+    req.user.jti = message.jti;
   };
 }
 

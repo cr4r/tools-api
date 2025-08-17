@@ -32,19 +32,21 @@ const {
   userPenggunaRoutes,
 } = require("./routes");
 
-
 //=====================================================================================//
 
 // Baca sertifikat SSL
-const httpsOptions = {
-  key: fs.readFileSync(path.join(__dirname, '../ssl', 'key.pem')),
-  cert: fs.readFileSync(path.join(__dirname, '../ssl', 'cert.pem'))
-};
+// const httpsOptions = {
+//   key: fs.readFileSync(path.join(__dirname, "../ssl", "key.pem")),
+//   cert: fs.readFileSync(path.join(__dirname, "../ssl", "cert.pem")),
+// };
 
-const fastify = require("fastify")({ logger: true,https: httpsOptions });
+const limitFile = 10 * 1024 * 1024; //10mb
+
+// const fastify = require("fastify")({ logger: true, https:httpsOptions });
+const fastify = require("fastify")({ logger: true, bodyLimit: limitFile });
 
 //// Tarok root_path di fastify (fastify.root_path;)
-fastify.decorate('root_path', process.cwd());
+fastify.decorate("root_path", process.cwd());
 
 //=====================================================================================//
 // function connect Database
@@ -73,7 +75,7 @@ const startDatabase = async (app) => {
 // register Form multipart
 fastify.register(fastifyMultipart, {
   limits: {
-    fileSize: 5 * 1024 * 1024, // Batasi ukuran file maksimum 5MB
+    fileSize: limitFile, // Batasi ukuran file maksimum 5MB
   },
 });
 
@@ -85,10 +87,15 @@ fastify.register(fastifyCors, {
   origin: (origin, cb) => {
     const allowedOrigins = [
       "http://localhost:3000",
-      "http://192.168.1.15",
+      "http://127.0.0.1:80",
+      "http://localhost",
+      "http://localhost:80",
       "http://192.168.1.15:3000",
-      "http://192.168.1.1:3000",
+      "http://192.168.1.15:5000",
+      "http://192.168.1.1:5000",
       "http://192.168.1.222",
+      "http://192.168.1.15:4000",
+      "http://192.168.1.15:4000",
       "http://localhost:4000",
       "https://openwrt.local:3001",
     ];
@@ -101,7 +108,12 @@ fastify.register(fastifyCors, {
   },
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // allow these methods
   credentials: true, // allow credentials,
-  allowedHeaders: ["Content-Type", "Authorization", "x-auth-token"],
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization",
+    "x-auth-token",
+    "X-User-Agent",
+  ],
   optionsSuccessStatus: 204, // Untuk menangani preflight di browser lama
   exposedHeaders: ["x-auth-token", "authorization"],
   // bodyParser: {

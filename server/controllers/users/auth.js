@@ -4,6 +4,7 @@ const {
   hashToken,
   verifyToken,
   generateAccessToken,
+  generateFotoToken,
   handleServerResponseError,
 } = require(`${root_path}/services`);
 
@@ -36,11 +37,13 @@ const user_token_refresh = async (req, reply) => {
     }
 
     const newAccessToken = generateAccessToken(user, saved.jti);
+    const newFotoProfile = generateFotoToken(user, saved.jti);
 
     return reply.status(201).send({
       status: true,
       message: "Berhasil memperbarui token kamu",
       token: newAccessToken,
+      foto: newFotoProfile,
     });
   } catch (err) {
     console.error(err);

@@ -3,6 +3,7 @@ const {
   handleServerResponseError,
   sanitizeInput,
   generateAccessToken,
+  generateFotoToken,
 } = require(`${root_path}/services`);
 const { User, UserAuditLog, HistoryLogin } = require(`${root_path}/models`);
 
@@ -39,18 +40,22 @@ const pengguna_get = async (req, reply) => {
 
 const pengguna_put = async (req, reply) => {
   try {
-    let updatedUser;
+    let updatedUser, fotoProfileUpdate;
     const userIdQuery = req.query.userId;
     const currentUser = req.user;
     const isAdminEditingOtherUser =
       userIdQuery && ["Admin", "Owner", "Developer"].includes(currentUser.role);
     const allowedFields = isAdminEditingOtherUser
-      ? ["email", "password", "fullName", "role"]
-      : ["email", "password", "fullName"];
+      ? ["email", "password", "fullName", "role", "foto"]
+      : ["email", "password", "fullName", "foto"];
     const updates = await sanitizeInput(req.body, allowedFields);
 
+    console.log(
+      `filter: ${JSON.stringify(updates)}\nbody ${JSON.stringify(req.body)}`
+    );
+
     if (isAdminEditingOtherUser) {
-      console.log("💼 Mode Admin: Editing user lain", updates);
+      console.log("💼 Mode Admin: Editing user lain");
 
       // Batasi pengubahan role
       const isAdmin =
@@ -102,13 +107,17 @@ const pengguna_put = async (req, reply) => {
       });
     }
 
-    const token = await generateAccessToken(updatedUser);
+    const token = await generateAccessToken(updatedUser, currentUser.jti);
 
-    return reply.code(200).send({
+    const sendBody = {
       status: true,
       token,
       message: "Data berhasil diperbarui",
-    });
+    };
+    if (updates.foto)
+      sendBody["foto"] = await generateFotoToken(updatedUser, currentUser.jti);
+
+    return reply.code(201).send(sendBody);
   } catch (err) {
     const { codeStatus, status, message } = await handleServerResponseError(
       err
@@ -178,6 +187,7 @@ const history_get = async (req, reply) => {
     akun: item.userId,
     deviceInfo: item.deviceInfo,
     expiredDate: item.expiryDate,
+    createdAt: item.createdAt,
     jti: item.jti,
   }));
 

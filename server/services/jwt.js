@@ -13,8 +13,12 @@ Refresh Token (setelah login) digunakan untuk mendapatkan akses token serta log 
 let issuer = "coders.family.api";
 let audience = "coders.family.app";
 
-function generateAccessToken(user, jti = uuidv4()) {
-  const { _id, email, role, fullName } = user;
+function generateAccessToken(
+  user,
+  jti = uuidv4(),
+  expiresIn = access_token_exp
+) {
+  const { _id, email, role, fullName, foto, createdAt } = user;
   return jwt.sign(
     {
       id: _id,
@@ -22,9 +26,27 @@ function generateAccessToken(user, jti = uuidv4()) {
       role,
       fullName,
       jti,
+      createdAt,
       iat: Math.floor(Date.now() / 1000),
     },
-    access_token_secret,
+    access_token_exp,
+    {
+      expiresIn: expiresIn,
+      issuer,
+      audience,
+    }
+  );
+}
+
+function generateFotoToken(user, foto, jti = uuidv4()) {
+  return jwt.sign(
+    {
+      id: user._id,
+      foto,
+      jti,
+      iat: Math.floor(Date.now() / 1000),
+    },
+    refresh_token_secret,
     {
       expiresIn: access_token_exp,
       issuer,
@@ -102,4 +124,5 @@ module.exports = {
   expiryDateToken,
   verifyToken,
   getTokenReq,
+  generateFotoToken,
 };

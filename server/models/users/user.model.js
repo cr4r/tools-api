@@ -1,5 +1,5 @@
 const root_path = process.cwd();
-const { roleUser } = require(root_path + '/' + process.env.CONFIG_FILE);
+const { roleUser } = require(root_path + "/" + process.env.CONFIG_FILE);
 
 const mongoose = require("mongoose");
 const bcryptjs = require("bcryptjs");
@@ -18,6 +18,10 @@ const UserSchema = new mongoose.Schema(
       trim: true,
       unique: true,
       lowercase: true,
+    },
+    foto: {
+      type: String,
+      trim: true,
     },
     role: {
       type: String,
